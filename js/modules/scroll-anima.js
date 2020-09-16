@@ -3,23 +3,42 @@ export default class ScrollAnima {
     this.sections = document.querySelectorAll(sections);
     this.windowMetade = window.innerHeight * 0.6;
 
-    this.animaScroll = this.animaScroll.bind(this);
+    this.checkDistances = this.checkDistances.bind(this);
   }
 
-  animaScroll() {
-    this.sections.forEach((section) => {
-      const sectionTop = section.getBoundingClientRect().top;
-      const isSectionVisible = sectionTop - this.windowMetade < 0;
-      if (isSectionVisible) {
-        section.classList.add("ativo");
-      } else if (section.classList.contains("ativo")) {
-        section.classList.remove("ativo");
+  // Pega a distância de cada item em relação ao topo do site
+  getDistances() {
+    this.distances = [...this.sections].map((section) => {
+      const offset = section.offsetTop;
+      return {
+        element: section,
+        offset: Math.floor(offset - this.windowMetade),
+      };
+    });
+  }
+
+  // Verifica a distância de cada item em relação ao scroll do site
+  checkDistances() {
+    this.distances.forEach((item) => {
+      if (window.pageYOffset > item.offset) {
+        item.element.classList.add("ativo");
+      } else if (item.element.classList.contains("ativo")) {
+        item.element.classList.remove("ativo");
       }
     });
   }
 
   init() {
-    this.animaScroll();
-    window.addEventListener("scroll", this.animaScroll);
+    if (this.sections.length) {
+      this.getDistances();
+      this.checkDistances();
+      window.addEventListener("scroll", this.checkDistances);
+    }
+    return this;
+  }
+
+  // Remove o evento de scroll
+  stop() {
+    window.removeEventListener("scroll", this.checkDistances);
   }
 }
