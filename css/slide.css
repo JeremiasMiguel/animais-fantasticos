@@ -24,7 +24,6 @@ img {
 
 .slide {
   display: flex;
-  margin-bottom: 40px;
 }
 
 .slide:hover {
